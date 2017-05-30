@@ -1,6 +1,7 @@
 #include <websocketpp/config/asio_client.hpp>
-
 #include <websocketpp/client.hpp>
+#include <boost/thread/thread.hpp>
+
 #ifndef WSCONN_H
 #define WSCONN_H
 typedef websocketpp::client<websocketpp::config::asio_tls_client> _client;
@@ -15,6 +16,7 @@ public:
 	discordWebSocket(std::string token);
 	discordWebSocket(const char *c){ discordWebSocket(std::string(c)); }
 	discordWebSocket(); // empty constructor
+	~discordWebSocket();
 	static void *run(void *ptr);
 private:
 	_client ws_endpoint;
@@ -22,6 +24,7 @@ private:
 	int heartbeat_interval;
 	std::string discord_token;
 	websocketpp::connection_hdl persistent_hdl;
+	boost::thread *hb_thread;
 
 	void on_message(websocketpp::connection_hdl hdl, message_ptr msg);
 	void on_close(websocketpp::connection_hdl);
@@ -29,7 +32,6 @@ private:
 	void on_fail(websocketpp::connection_hdl hdl);
 	void on_socket_init(websocketpp::connection_hdl);
 	context_ptr on_tls_init(websocketpp::connection_hdl);
-	// void start(std::string uri); // probably not needed
 	static void *heartbeat(void *ptr);
 };
 #endif
