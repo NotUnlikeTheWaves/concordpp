@@ -4,7 +4,7 @@ project (Discord-CPP)
 #set(THREADS_PREFER_PTHREAD_FLAG ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 #set(CMAKE_BUILD_TYPE Release)
-find_package(Boost 1.62 REQUIRED COMPONENTS system)
+find_package(Boost 1.58 REQUIRED COMPONENTS system)
 #find_package(Threads REQUIRED)
 find_package(OpenSSL REQUIRED openssl)
 
