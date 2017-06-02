@@ -1,4 +1,5 @@
-#include <client.h>
+#include "client.h"
+#include "api.h"
 
 int main(int argc, char* argv[]) {
     std::string uri = "wss://gateway.discord.gg/?v=5&encoding=json";
@@ -19,9 +20,13 @@ int main(int argc, char* argv[]) {
     } catch (...) {
         std::cout << "other exception" << std::endl;
     }
-    //while(1);
+    
+    HttpAPIHandler *handler = new HttpAPIHandler("MzAwMzg2MTQ2OTQ3NDMyNDQ4.DApDZg.W5G01s0dGHJV9NgIVETQCZ3c_WE");
+    handler->CreateMessage(319210580865187860, "Test message");
+
     char end;
     std::cin >> end;
+    delete handler;
     delete client;
     std::cout << "end of program" << std::endl;
 }

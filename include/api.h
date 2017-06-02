@@ -1,0 +1,14 @@
+#include <restclient-cpp/connection.h>
+#include <restclient-cpp/restclient.h>
+
+class HttpAPIHandler {
+public:
+	HttpAPIHandler(std::string discord_bot_token);
+	~HttpAPIHandler();
+
+		// API Functionality
+	void CreateMessage(unsigned long channel_id, std::string message);
+private:
+	std::string discord_token;
+	RestClient::Connection *http_req_conn;
+};

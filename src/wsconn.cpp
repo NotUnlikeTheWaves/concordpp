@@ -133,8 +133,6 @@ void discordWebSocket::on_message(websocketpp::connection_hdl hdl, message_ptr m
     		std::cout << "Token from memory: " << discord_token << std::endl;
     		//identify["d"]["shard"] = {1, 1};
 			ws_endpoint.send(hdl, identify.dump(), websocketpp::frame::opcode::text);
-
-
     		break;
     	}
     	default: {

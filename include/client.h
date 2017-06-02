@@ -1,6 +1,6 @@
 #include <string>
 #include <iostream>
-#include <wsconn.h>
+#include "wsconn.h"
 #include <boost/thread/thread.hpp>
 #ifndef CLIENT_H
 #define CLIENT_H

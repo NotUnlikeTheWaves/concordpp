@@ -10,10 +10,10 @@ find_package(OpenSSL REQUIRED openssl)
 
 include_directories( ./include ./libs/websocketpp ./libs/json/src ${Boost_INCLUDE_DIRS} ${OPENSSL_INCLUDE_DIRS})
 
-link_directories(${Boost_LIBRARY_DIRS} ${OPENSSL_LIBRARY_DIRS})
+link_directories(${Boost_LIBRARY_DIRS} ${OPENSSL_LIBRARY_DIRS} /usr/local/lib/)
 
 #add_executable(runfile src/main.cpp)
 
 file(GLOB SOURCES "src/*.cpp")
 add_executable(runfile ${SOURCES})
-target_link_libraries(runfile ${PROJECT_LINK_LIBS} ${Boost_LIBRARIES} ${OPENSSL_LIBRARIES} pthread boost_thread)
+target_link_libraries(runfile ${PROJECT_LINK_LIBS} ${Boost_LIBRARIES} ${OPENSSL_LIBRARIES} pthread boost_thread restclient-cpp curl)
