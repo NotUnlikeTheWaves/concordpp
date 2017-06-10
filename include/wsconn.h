@@ -1,9 +1,12 @@
+#ifndef WSCONN_H
+#define WSCONN_H
+
 #include <websocketpp/config/asio_client.hpp>
 #include <websocketpp/client.hpp>
 #include <boost/thread/thread.hpp>
 
-#ifndef WSCONN_H
-#define WSCONN_H
+#include "eventhandler.h"
+
 typedef websocketpp::client<websocketpp::config::asio_tls_client> _client;
 typedef websocketpp::config::asio_tls_client::message_type::ptr message_ptr;
 typedef websocketpp::lib::shared_ptr<boost::asio::ssl::context> context_ptr;
@@ -17,15 +20,9 @@ public:
 	discordWebSocket(const char *c){ discordWebSocket(std::string(c)); }
 	discordWebSocket(); // empty constructor
 	~discordWebSocket();
+	void setEventHandler(eventHandler *event_handler);
 	static void *run(void *ptr);
 private:
-	_client ws_endpoint;
-	int sequence_no;
-	int heartbeat_interval;
-	std::string discord_token;
-	websocketpp::connection_hdl persistent_hdl;
-	boost::thread *hb_thread;
-
 	void on_message(websocketpp::connection_hdl hdl, message_ptr msg);
 	void on_close(websocketpp::connection_hdl);
 	void on_open(websocketpp::connection_hdl hdl);
@@ -33,5 +30,13 @@ private:
 	void on_socket_init(websocketpp::connection_hdl);
 	context_ptr on_tls_init(websocketpp::connection_hdl);
 	static void *heartbeat(void *ptr);
+
+	_client ws_endpoint;
+	int sequence_no;
+	int heartbeat_interval;
+	std::string discord_token;
+	websocketpp::connection_hdl persistent_hdl;
+	boost::thread *hb_thread;
+	eventHandler *handler = NULL;
 };
 #endif

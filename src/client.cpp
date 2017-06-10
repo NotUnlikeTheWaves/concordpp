@@ -21,5 +21,6 @@ void discordClient::connect() {
 		webSocket = new discordWebSocket(discord_token);
 		run_thread = new boost::thread(discordWebSocket::run, (void *) webSocket);
 		std::cout << "Connection thread started" << std::endl;
+		webSocket->setEventHandler(&events);
 	} else std::cout << "A websocket already exists!" << std::endl;
 }

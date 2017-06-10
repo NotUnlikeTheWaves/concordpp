@@ -1,3 +1,6 @@
+#ifndef API_H
+#define API_H
+
 #include <restclient-cpp/connection.h>
 #include <restclient-cpp/restclient.h>
 
@@ -7,8 +10,11 @@ public:
 	~HttpAPIHandler();
 
 		// API Functionality
-	void CreateMessage(unsigned long channel_id, std::string message);
+    void CreateMessage(unsigned long channel_id, std::string message);
+    void CreateMessage(std::string channel_id, std::string message);
 private:
 	std::string discord_token;
 	RestClient::Connection *http_req_conn;
 };
+
+#endif

@@ -18,23 +18,13 @@ HttpAPIHandler::~HttpAPIHandler() {
 }
 
 void HttpAPIHandler::CreateMessage(unsigned long channel_id, std::string message) {
-	std::cout << "Attempt to CreateMessage: " << message << std::endl;
-	http_req_conn->post("/channels/" + std::to_string(channel_id) + "/messages", 
-		"{ \"content\": \"" + message + "\"}");
+    std::cout << "Attempt to CreateMessage: " << message << std::endl;
+    http_req_conn->post("/channels/" + std::to_string(channel_id) + "/messages",
+        "{ \"content\": \"" + message + "\"}");
 }
 
-
-                //     // try to do HTTPS request
-                // RestClient::init();
-                // std::cout << "Init restclient" << std::endl;
-                // RestClient::Connection *conn = new RestClient::Connection("https://discordapp.com/api");
-                // conn->SetTimeout(5);
-                // conn->SetUserAgent("NirvanaBot (none, 0.1)");
-                // conn->FollowRedirects(true);
-
-                // RestClient::HeaderFields headers;
-                // headers["Authorization"] = "Bot " + discord_token;
-                // conn->SetHeaders(headers);
-                // RestClient::Response r = conn->post("/channels/294187421858529280/messages", "{ \"content\": \"not bad for a test message\"}");
-                // std::cout << std::endl << std::endl << std::endl << r.body << std::endl << std::endl;
-                // RestClient::disable();
+void HttpAPIHandler::CreateMessage(std::string channel_id, std::string message) {
+    std::cout << "Attempt to CreateMessage: " << message << std::endl;
+    http_req_conn->post("/channels/" + channel_id + "/messages",
+        "{ \"content\": \"" + message + "\"}");
+}

@@ -63,6 +63,11 @@ void *discordWebSocket::run(void *ptr) {
     dws->ws_endpoint.run();
 }
 
+void discordWebSocket::setEventHandler(eventHandler *event_handler) {
+    std::cout << "set event handler" << std::endl;
+    handler = event_handler;
+}
+
 void discordWebSocket::on_socket_init(websocketpp::connection_hdl) {
 	std::cout << "Socket init." << std::endl;
 }
@@ -139,6 +144,10 @@ void discordWebSocket::on_message(websocketpp::connection_hdl hdl, message_ptr m
     		std::cout << "Unimplemented opcode: " << json_msg["op"] << std::endl;
     		break;
     	}
+    }
+
+    if(handler != NULL) {
+        handler->callHandlers(json_msg);
     }
 }
 void discordWebSocket::on_close(websocketpp::connection_hdl) {
