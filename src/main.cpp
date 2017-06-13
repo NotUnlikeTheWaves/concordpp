@@ -2,12 +2,8 @@
 #include "api.h"
 
 int main(int argc, char* argv[]) {
-    std::string uri = "wss://gateway.discord.gg/?v=5&encoding=json";
     discordClient *client;
-    if (argc == 2) {
-        uri = argv[1];
-    }
-
+    
     try {
         client = new discordClient("MzAwMzg2MTQ2OTQ3NDMyNDQ4.DApDZg.W5G01s0dGHJV9NgIVETQCZ3c_WE");
         std::cout << "Client created. Type something/hit enter to connect." << std::endl;

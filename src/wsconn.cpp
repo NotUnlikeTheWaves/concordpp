@@ -1,4 +1,4 @@
-#include <wsconn.h>
+#include "wsconn.h"
 
 #include <websocketpp/config/asio_client.hpp>
 
@@ -7,6 +7,7 @@
 #include <json.hpp>
 
 #include <iostream>
+//#include "wsstate.h"
 
 using websocketpp::lib::placeholders::_1;
 using websocketpp::lib::placeholders::_2;
@@ -18,6 +19,7 @@ using json = nlohmann::json;
 discordWebSocket::discordWebSocket(std::string token) {
 	discord_token = token;
     hb_thread = NULL;
+    socket_state = STATE_NOT_STARTED;
 	std::cout << "Try to connect: " << token << std::endl;
 	// Initialize ASIO
     ws_endpoint.init_asio();

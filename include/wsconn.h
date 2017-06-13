@@ -1,6 +1,7 @@
 #include <websocketpp/config/asio_client.hpp>
 #include <websocketpp/client.hpp>
 #include <boost/thread/thread.hpp>
+//#include "wsstate.h"
 
 #ifndef WSCONN_H
 #define WSCONN_H
@@ -19,6 +20,14 @@ public:
 	~discordWebSocket();
 	static void *run(void *ptr);
 private:
+	enum SocketState {
+		STATE_NOT_STARTED,
+		STATE_CONNECTING,
+		STATE_CONNECTED,
+		STATE_RECONNECTING,
+	};
+	SocketState socket_state;
+
 	_client ws_endpoint;
 	int sequence_no;
 	int heartbeat_interval;

@@ -7,7 +7,7 @@ public:
 	~HttpAPIHandler();
 
 		// API Functionality
-	void CreateMessage(unsigned long channel_id, std::string message);
+	void CreateMessage(unsigned long long channel_id, std::string message);
 private:
 	std::string discord_token;
 	RestClient::Connection *http_req_conn;
