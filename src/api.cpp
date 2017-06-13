@@ -18,7 +18,11 @@ HttpAPIHandler::~HttpAPIHandler() {
 }
 
 void HttpAPIHandler::CreateMessage(unsigned long long channel_id, std::string message) {
-	std::cout << "Attempt to CreateMessage: " << message << std::endl;
-	http_req_conn->post("/channels/" + std::to_string(channel_id) + "/messages", 
-		"{ \"content\": \"" + message + "\"}");
+    http_req_conn->post("/channels/" + std::to_string(channel_id) + "/messages",
+        "{ \"content\": \"" + message + "\"}");
+}
+
+void HttpAPIHandler::CreateMessage(std::string channel_id, std::string message) {
+    http_req_conn->post("/channels/" + channel_id + "/messages",
+        "{ \"content\": \"" + message + "\"}");
 }
