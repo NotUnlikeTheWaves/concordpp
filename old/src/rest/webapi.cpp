@@ -1,4 +1,4 @@
-#include "api.h"
+#include "rest/webapi.h"
 #include <iostream>
 HttpAPIHandler::HttpAPIHandler(std::string discord_bot_token) {
 	discord_token = discord_bot_token;

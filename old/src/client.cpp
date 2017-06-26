@@ -1,5 +1,5 @@
 #include "client.h"
-#include "wsconn.h"
+#include "gateway/wsconn.h"
 discordClient::discordClient(std::string token) {
 	std::cout << "Enter client" << std::endl;
 	discord_token = token;

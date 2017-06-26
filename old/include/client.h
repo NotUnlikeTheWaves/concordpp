@@ -3,7 +3,7 @@
 
 #include <string>
 #include <iostream>
-#include "wsconn.h"
+#include "gateway/wsconn.h"
 #include <boost/thread/thread.hpp>
 #include "eventhandler.h"
 

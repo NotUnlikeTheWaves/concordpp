@@ -1,13 +1,8 @@
-#include "wsconn.h"
-
+#include "gateway/wsconn.h"
 #include <websocketpp/config/asio_client.hpp>
-
 #include <websocketpp/client.hpp>
-
 #include <json.hpp>
-
 #include <iostream>
-//#include "wsstate.h"
 
 using websocketpp::lib::placeholders::_1;
 using websocketpp::lib::placeholders::_2;

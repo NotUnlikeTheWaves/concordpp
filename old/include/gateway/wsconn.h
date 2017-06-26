@@ -4,7 +4,6 @@
 #include <websocketpp/config/asio_client.hpp>
 #include <websocketpp/client.hpp>
 #include <boost/thread/thread.hpp>
-//#include "wsstate.h"
 
 #include "eventhandler.h"
 
@@ -12,7 +11,6 @@ typedef websocketpp::client<websocketpp::config::asio_tls_client> _client;
 typedef websocketpp::config::asio_tls_client::message_type::ptr message_ptr;
 typedef websocketpp::lib::shared_ptr<boost::asio::ssl::context> context_ptr;
 typedef websocketpp::client<websocketpp::config::asio_tls_client>::connection_ptr connection_ptr;
-//typedef websocketpp::client<websocketpp::config::asio_tls_client>::connection_ptr connection_ptr;
 
 class discordWebSocket {
 public:
