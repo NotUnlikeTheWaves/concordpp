@@ -11,8 +11,9 @@ using websocketpp::lib::bind;
 
 using json = nlohmann::json;
 
-web_socket::web_socket(std::string *token) {
+web_socket::web_socket(std::string *token, callback_handler *cb_handler) {
     this->token = token;
+    this->cb_handler = cb_handler;
     last_sequence_number = 0;
     heartbeat_thread = NULL;
     run_thread = NULL;
@@ -109,11 +110,13 @@ void web_socket::on_message(websocketpp::connection_hdl hdl, message_ptr msg) {
 
     switch(json_msg["op"].get<int>()) {
         case 0 : {
-            if(json_msg["t"] == "READY") {
+            std::string event = json_msg["t"];
+            if(event == "READY") {
                 std::cout <<  "Ready event!" << std::endl;
                 persistent_hdl = hdl;
                 heartbeat_thread = new boost::thread(boost::bind(&web_socket::send_heartbeat, this));
             }
+            cb_handler->handle_event(event, json_msg);
             break;
         }
         case 10: {
@@ -135,6 +138,8 @@ void web_socket::on_message(websocketpp::connection_hdl hdl, message_ptr msg) {
             break;
         }
     }
+
+
 }
 
 void web_socket::on_close(websocketpp::connection_hdl) {

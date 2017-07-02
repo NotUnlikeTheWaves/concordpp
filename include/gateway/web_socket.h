@@ -5,6 +5,8 @@
 #include <websocketpp/client.hpp>
 #include <boost/thread/thread.hpp>
 
+#include "gateway/callback_handler.h"
+
 typedef websocketpp::client<websocketpp::config::asio_tls_client> web_socket_client;
 typedef websocketpp::config::asio_tls_client::message_type::ptr message_ptr;
 typedef websocketpp::lib::shared_ptr<boost::asio::ssl::context> context_ptr;
@@ -12,7 +14,7 @@ typedef websocketpp::client<websocketpp::config::asio_tls_client>::connection_pt
 
 class web_socket {
 public:
-    web_socket(std::string *token);
+    web_socket(std::string *token, callback_handler *cb_handler);
     ~web_socket();
     void start();
 private:
@@ -22,6 +24,8 @@ private:
 
     boost::thread *heartbeat_thread;
     boost::thread *run_thread;
+
+    callback_handler *cb_handler;
 
     void threaded_run();
     void send_heartbeat();
