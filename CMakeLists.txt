@@ -10,6 +10,6 @@ include_directories( ./include ./libs/websocketpp ./libs/json/src ${Boost_INCLUD
 
 link_directories(${Boost_LIBRARY_DIRS} ${OPENSSL_LIBRARY_DIRS} /usr/local/lib/)
 
-file(GLOB SOURCES "src/*.cpp")
-add_executable(runfile ${SOURCES})
+file(GLOB_RECURSE SOURCES "src/*.cpp")
+add_executable(runfile application/main.cpp ${SOURCES})
 target_link_libraries(runfile ${PROJECT_LINK_LIBS} ${Boost_LIBRARIES} ${OPENSSL_LIBRARIES} pthread boost_thread restclient-cpp curl)
