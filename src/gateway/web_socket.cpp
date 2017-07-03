@@ -116,7 +116,7 @@ void web_socket::on_message(websocketpp::connection_hdl hdl, message_ptr msg) {
                 persistent_hdl = hdl;
                 heartbeat_thread = new boost::thread(boost::bind(&web_socket::send_heartbeat, this));
             }
-            cb_handler->handle_event(event, json_msg);
+            cb_handler->handle_event(event, json_msg["d"]);
             break;
         }
         case 10: {

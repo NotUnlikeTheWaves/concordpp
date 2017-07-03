@@ -3,19 +3,21 @@
 #include <json.hpp>
 #include <iostream>
 int quit = 0;
-
+rest_client *d_rest;
 void on_message(nlohmann::json data) {
-    std::cout << "Message in on_message" << std::endl;
+    if(data["content"] == "test me") {
+        d_rest->create_message(data["channel_id"], "This is (not) a test");
+    } else if(data["content"] == "shutdown") {
+        d_rest->create_message(data["channel_id"], "zzz");
+        quit++;
+    }
 }
 
 int main(int argc, char* argv[]) {
     gateway_client *d_gateway = new gateway_client("MzAwMzg2MTQ2OTQ3NDMyNDQ4.DApDZg.W5G01s0dGHJV9NgIVETQCZ3c_WE");
-    rest_client *d_rest = new rest_client("MzAwMzg2MTQ2OTQ3NDMyNDQ4.DApDZg.W5G01s0dGHJV9NgIVETQCZ3c_WE");
-    d_rest->create_message("319210580865187860", "Bootup sequence");
+    d_rest = new rest_client("MzAwMzg2MTQ2OTQ3NDMyNDQ4.DApDZg.W5G01s0dGHJV9NgIVETQCZ3c_WE");
     d_gateway->add_callback("MESSAGE_CREATE", on_message);
-    char d = '_';
-    std::cin >> d;
-    // while(quit == 0) {}
+    while(quit == 0) {}
     delete d_gateway;
     delete d_rest;
 }
