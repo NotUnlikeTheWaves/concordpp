@@ -10,7 +10,7 @@ void on_message(nlohmann::json data) {
     if(data["content"] == "test me") {
         d_rest->create_message(data["channel_id"], "This is (not) a test");
     } else if(data["content"] == "shutdown") {
-        d_rest->create_message(data["channel_id"], "zzz");
+        d_rest->create_message(data["channel_id"], "zzz", [](int code, nlohmann::json data) { std::cout << data.dump() << std::endl; });
         quit++;
     }
 }

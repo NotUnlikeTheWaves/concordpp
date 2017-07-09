@@ -4,19 +4,21 @@
 using namespace concordpp;
 using json = nlohmann::json;
 
-void rest_client::api_call(std::string uri, rest_request_type method, json *argument) {
+void rest_client::api_call(std::string uri, rest_request_type method, http_callback callback, json *argument) {
+    RestClient::Response response;
     switch(method) {
         case GET:
-            http_conn->get(uri);
+            response = http_conn->get(uri);
             break;
         case POST:
-            http_conn->post(uri, argument->dump());
+            response = http_conn->post(uri, argument->dump());
             break;
         case PUT:
-            http_conn->put(uri, argument->dump());
+            response = http_conn->put(uri, argument->dump());
             break;
         case DELETE:
-            http_conn->del(uri);
+            response = http_conn->del(uri);
             break;
     }
+    callback(response.code, nlohmann::json::parse(response.body));
 }

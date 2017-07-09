@@ -3,8 +3,8 @@
 using namespace concordpp;
 using json = nlohmann::json;
 
-void rest_client::create_message(std::string channel, std::string message) {
+void rest_client::create_message(std::string channel, std::string message, http_callback callback) {
 	json arg;
 	arg["content"] = message;
-	this->api_call("/channels/" + channel + "/messages", POST, &arg);
+	this->api_call("/channels/" + channel + "/messages", POST, callback, &arg);
 }
