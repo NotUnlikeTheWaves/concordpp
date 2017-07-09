@@ -2,8 +2,10 @@
 #include "rest_client.h"
 #include <json.hpp>
 #include <iostream>
+
 int quit = 0;
-rest_client *d_rest;
+concordpp::rest_client *d_rest;
+
 void on_message(nlohmann::json data) {
     if(data["content"] == "test me") {
         d_rest->create_message(data["channel_id"], "This is (not) a test");
@@ -14,8 +16,8 @@ void on_message(nlohmann::json data) {
 }
 
 int main(int argc, char* argv[]) {
-    gateway_client *d_gateway = new gateway_client("MzAwMzg2MTQ2OTQ3NDMyNDQ4.DApDZg.W5G01s0dGHJV9NgIVETQCZ3c_WE");
-    d_rest = new rest_client("MzAwMzg2MTQ2OTQ3NDMyNDQ4.DApDZg.W5G01s0dGHJV9NgIVETQCZ3c_WE");
+    concordpp::gateway_client *d_gateway = new concordpp::gateway_client("MzAwMzg2MTQ2OTQ3NDMyNDQ4.DApDZg.W5G01s0dGHJV9NgIVETQCZ3c_WE");
+    d_rest = new concordpp::rest_client("MzAwMzg2MTQ2OTQ3NDMyNDQ4.DApDZg.W5G01s0dGHJV9NgIVETQCZ3c_WE");
     d_gateway->add_callback("MESSAGE_CREATE", on_message);
     while(quit == 0) {}
     delete d_gateway;

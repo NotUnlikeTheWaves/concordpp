@@ -7,20 +7,22 @@
 
 #include "rest/api_call.h"
 
-class rest_client {
-public:
-	rest_client(std::string token);
-	~rest_client();
+namespace concordpp {
+    class rest_client {
+    public:
+        rest_client(std::string token);
+        ~rest_client();
 
-		// ========== API methods ========== //
-		// Channel
-	void create_message(std::string channel, std::string message);
+            // ========== API methods ========== //
+            // Channel
+        void create_message(std::string channel, std::string message);
 
 
-private:
-	std::string token;
-	RestClient::Connection *http_conn;
-	void api_call(std::string uri, rest_request_type method, nlohmann::json *argument = NULL);
-};
+    private:
+        std::string token;
+        RestClient::Connection *http_conn;
+        void api_call(std::string uri, rest_request_type method, nlohmann::json *argument = NULL);
+    };
+}
 
 #endif

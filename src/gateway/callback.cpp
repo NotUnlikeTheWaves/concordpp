@@ -1,5 +1,6 @@
 #include "gateway/callback.h"
 
+using namespace concordpp;
 using json = nlohmann::json;
 
 event_callback::event_callback(std::string event, std::function<void(json)> callback) {

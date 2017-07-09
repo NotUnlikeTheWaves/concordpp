@@ -5,11 +5,11 @@
 
 #include "gateway/web_socket.h"
 
+using namespace concordpp;
+using json = nlohmann::json;
 using websocketpp::lib::placeholders::_1;
 using websocketpp::lib::placeholders::_2;
 using websocketpp::lib::bind;
-
-using json = nlohmann::json;
 
 web_socket::web_socket(std::string *token, callback_handler *cb_handler) {
     this->token = token;
