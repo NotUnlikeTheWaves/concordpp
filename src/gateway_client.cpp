@@ -1,5 +1,9 @@
 #include "gateway_client.h"
 #include <iostream>
+
+using namespace concordpp;
+using json = nlohmann::json;
+
 gateway_client::gateway_client(std::string token, bool auto_connect) {
     this->token = token;
     socket = NULL;
