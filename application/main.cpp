@@ -19,6 +19,11 @@ int main(int argc, char* argv[]) {
     concordpp::gateway_client *d_gateway = new concordpp::gateway_client("MzAwMzg2MTQ2OTQ3NDMyNDQ4.DApDZg.W5G01s0dGHJV9NgIVETQCZ3c_WE");
     d_rest = new concordpp::rest_client("MzAwMzg2MTQ2OTQ3NDMyNDQ4.DApDZg.W5G01s0dGHJV9NgIVETQCZ3c_WE");
     d_gateway->add_callback("MESSAGE_CREATE", on_message);
+    d_gateway->add_callback("MESSAGE_CREATE", [](nlohmann::json data){
+        if(data["content"] == "lambda") {
+            d_rest->create_message(data["channel_id"], "Lambda test done.");
+        }
+    });
     while(quit == 0) {}
     delete d_gateway;
     delete d_rest;
