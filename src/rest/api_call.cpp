@@ -1,5 +1,8 @@
 #include "rest_client.h"
 #include <iostream>
+
+using json = nlohmann::json;
+
 void rest_client::api_call(std::string uri, rest_request_type method, json *argument) {
 	switch(method) {
 		case GET:

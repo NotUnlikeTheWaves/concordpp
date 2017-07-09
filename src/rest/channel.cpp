@@ -1,5 +1,7 @@
 #include "rest_client.h"
 
+using json = nlohmann::json;
+
 void rest_client::create_message(std::string channel, std::string message) {
 	json arg;
 	arg["content"] = message;

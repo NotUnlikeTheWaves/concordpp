@@ -7,8 +7,6 @@
 
 #include "rest/api_call.h"
 
-using json = nlohmann::json;
-
 class rest_client {
 public:
 	rest_client(std::string token);
@@ -22,7 +20,7 @@ public:
 private:
 	std::string token;
 	RestClient::Connection *http_conn;
-	void api_call(std::string uri, rest_request_type method, json *argument = NULL);
+	void api_call(std::string uri, rest_request_type method, nlohmann::json *argument = NULL);
 };
 
 #endif
