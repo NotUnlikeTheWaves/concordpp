@@ -17,6 +17,7 @@ namespace concordpp {
         web_socket(std::string *token, callback_handler *cb_handler);
         ~web_socket();
         void start();
+        void stop();
     private:
         std::string *token; // Keep pointer to token in gateway_client.h
         int last_sequence_number;

@@ -43,15 +43,19 @@ web_socket::web_socket(std::string *token, callback_handler *cb_handler) {
 }
 
 web_socket::~web_socket() {
-    if(heartbeat_thread != NULL) {
-        heartbeat_thread->interrupt();
-        heartbeat_thread->join();
-    }
-    client.close(persistent_hdl, websocketpp::close::status::normal, "");
 }
 
 void web_socket::start() {
     client.run();
+}
+
+void web_socket::stop() {
+    if(heartbeat_thread != NULL) {
+        heartbeat_thread->interrupt();
+        heartbeat_thread->join();
+        delete heartbeat_thread;
+    }
+    client.close(persistent_hdl, websocketpp::close::status::normal, "");
 }
 
 void web_socket::on_socket_init(websocketpp::connection_hdl) {

@@ -23,8 +23,7 @@ void gateway_client::connect() {
 }
 
 void gateway_client::stop() {
-    delete socket;
-    socket = NULL;
+    socket->stop();
 }
 
 void gateway_client::add_callback(std::string event_name, std::function<void(json)> callback) {
