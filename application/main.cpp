@@ -12,6 +12,34 @@ void on_message(nlohmann::json data) {
     } else if(data["content"] == "shutdown") {
         d_rest->create_message(data["channel_id"], "zzz", [](int code, nlohmann::json data) { std::cout << data.dump() << std::endl; });
         quit++;
+    } else if(data["content"] == "channels") {
+        std::string tempchan = data["channel_id"];
+        std::string *channel = new std::string(tempchan);
+        d_rest->get_current_user_guilds([channel](int code, nlohmann::json data){
+            int *count = new int(data.size());
+            std::string *response = new std::string("");
+            for (nlohmann::json::iterator it = data.begin(); it != data.end(); ++it) {
+                std::cout << *it << '\n'; // debug only!
+                d_rest->get_guild_channels((*it)["id"], [channel, count, response] (int code, nlohmann::json data) {
+                    std::cout << "In guild channel callback: " << (*count) << std::endl;
+                    (*count) = (*count) - 1;
+                    for(nlohmann::json::iterator it = data.begin(); it != data.end(); ++it) {
+                        std::string chan_name = (*it)["name"];
+                        (*response) = (*response) + chan_name + "\n";
+                        std::cout << (*count) << std::endl;
+                    }
+                    if((*count) == 0) {
+                        std::cout << "make message to channels: " << (*channel) << std::endl;
+                        d_rest->create_message((*channel), "```json\n" + (*response) + "\n```", [](int code, nlohmann::json data) {
+                            std::cout << "cm response: " << code << "\nalso: " << data.dump(4) << std::endl;
+                        });
+                        delete channel;
+                        delete response;
+                        delete count;
+                    }
+                });
+            }
+        });
     }
 }
 
