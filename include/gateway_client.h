@@ -9,9 +9,10 @@
 namespace concordpp {
     class gateway_client {
     public:
-        gateway_client(std::string token, bool auto_connect = true);
+        gateway_client(std::string token);
         ~gateway_client();
         void connect();
+        void stop();
 
             // Event handler/callback manager
         void add_callback(std::string event_name, std::function<void(nlohmann::json)> callback);

@@ -16,7 +16,6 @@ web_socket::web_socket(std::string *token, callback_handler *cb_handler) {
     this->cb_handler = cb_handler;
     last_sequence_number = 0;
     heartbeat_thread = NULL;
-    run_thread = NULL;
 
     client.init_asio();
     client.set_access_channels(websocketpp::log::alevel::all); //check
@@ -49,16 +48,9 @@ web_socket::~web_socket() {
         heartbeat_thread->join();
     }
     client.close(persistent_hdl, websocketpp::close::status::normal, "");
-    run_thread->join();
 }
 
 void web_socket::start() {
-    run_thread = new boost::thread(
-        boost::bind(&web_socket::threaded_run, this)
-    );
-}
-
-void web_socket::threaded_run() {
     client.run();
 }
 
