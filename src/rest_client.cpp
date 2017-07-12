@@ -9,9 +9,7 @@ rest_client::rest_client(std::string token) {
     http_conn->SetTimeout(5);
     http_conn->FollowRedirects(true);
     http_conn->SetUserAgent("NirvanaBot (none, 0.1)");
-    RestClient::HeaderFields headers;
-    headers["Authorization"] = "Bot " + token;
-    http_conn->SetHeaders(headers);
+    http_conn->AppendHeader("Authorization", "Bot " + token);
 }
 
 rest_client::~rest_client() {
