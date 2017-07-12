@@ -3,6 +3,6 @@
 using namespace concordpp;
 using json = nlohmann::json;
 
-void rest_client::get_guild_channels(std::string guild_snowflake, http_callback callback) {
-    this->api_call("/guilds/" + guild_snowflake + "/channels", GET, callback);
+void rest_client::get_guild_channels(snowflake guild, http_callback callback) {
+    this->api_call("/guilds/" + guild + "/channels", GET, callback);
 }

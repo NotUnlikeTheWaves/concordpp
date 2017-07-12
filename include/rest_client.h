@@ -13,22 +13,25 @@ namespace concordpp {
             // int = HTTP code (e.g. 200, 204, etc)
             // nlohman::json = the response data
         typedef std::function<void(int, nlohmann::json)> http_callback;
+        typedef std::string snowflake;
     public:
         rest_client(std::string token);
         ~rest_client();
 
             // ========== API methods ========== //
             // Channel
-        void create_message(std::string channel, std::string message, http_callback callback = [](int, nlohmann::json){});
+        void create_message(snowflake channel, std::string message, http_callback callback = [](int, nlohmann::json){});
 
             // Guild
-        void get_guild_channels(std::string guild_snowflake, http_callback callback = [](int, nlohmann::json){});
+        void get_guild_channels(snowflake guild, http_callback callback = [](int, nlohmann::json){});
 
             // User
         void get_current_user_guilds(http_callback callback = [](int, nlohmann::json){});
     private:
         std::string token;
         RestClient::Connection *http_conn;
+
+            // Base call for all HTTP API requests
         void api_call(std::string uri, rest_request_type method, http_callback callback, nlohmann::json *argument = NULL);
     };
 }
