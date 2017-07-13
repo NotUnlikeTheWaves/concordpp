@@ -24,7 +24,6 @@ namespace concordpp {
         int heartbeat_interval;
 
         boost::thread *heartbeat_thread;
-        boost::thread *run_thread;
 
         callback_handler *cb_handler;
 

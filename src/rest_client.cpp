@@ -4,25 +4,12 @@ using namespace concordpp;
 
 rest_client::rest_client(std::string token) {
     this->token = token;
-    open_connection();
+    http_thread_count = 0;
+    RestClient::init();
 }
 
 rest_client::~rest_client() {
+        // Wait for all HTTP threads to finish
+    while(http_thread_count > 0) {}
     RestClient::disable();
-    delete http_conn;
-}
-
-void rest_client::open_connection() {
-    RestClient::init();
-    http_conn = new RestClient::Connection("https://discordapp.com/api");
-    http_conn->SetTimeout(5);
-    http_conn->FollowRedirects(true);
-    http_conn->SetUserAgent("NirvanaBot (none, 0.1)");
-    http_conn->AppendHeader("Authorization", "Bot " + token);
-    last_request = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-}
-
-void rest_client::reset_connection() {
-    delete http_conn;
-    open_connection();
 }

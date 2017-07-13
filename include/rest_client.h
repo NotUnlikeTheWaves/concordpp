@@ -2,7 +2,7 @@
 #define REST_CLIENT_H
 
 #include <functional>
-#include <chrono>
+#include <boost/thread/thread.hpp>
 #include <restclient-cpp/connection.h>
 #include <restclient-cpp/restclient.h>
 #include <json.hpp>
@@ -30,14 +30,11 @@ namespace concordpp {
         void get_current_user_guilds(http_callback callback = [](int, nlohmann::json){});
     private:
         std::string token;
-        RestClient::Connection *http_conn;
-        uint64_t last_request;
+        int http_thread_count;
 
             // Base call for all HTTP API requests
-        void api_call(std::string uri, rest_request_type method, http_callback callback, nlohmann::json *argument = NULL);
-        void perform_request(std::string uri, rest_request_type method, http_callback callback, nlohmann::json *argument = NULL);
-        void open_connection();
-        void reset_connection();
+        void api_call(std::string uri, rest_request_type method, http_callback callback, nlohmann::json argument = NULL);
+        void perform_request(std::string uri, rest_request_type method, http_callback callback, nlohmann::json argument = NULL);
     };
 }
 

@@ -11,9 +11,8 @@ void on_message(nlohmann::json data) {
     if(data["content"] == "test me") {
         d_rest->create_message(data["channel_id"], "This is (not) a test");
     } else if(data["content"] == "shutdown") {
-        d_rest->create_message(data["channel_id"], "zzz", [](int code, nlohmann::json data) {
-            d_gateway->stop();
-        });
+        d_gateway->stop();
+        d_rest->create_message(data["channel_id"], "zzz", [](int code, nlohmann::json data) {});
     } else if(data["content"] == "channels") {
         std::string tempchan = data["channel_id"];
         std::string *channel = new std::string(tempchan);

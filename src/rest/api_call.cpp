@@ -6,32 +6,33 @@
 using namespace concordpp;
 using json = nlohmann::json;
 
-void rest_client::api_call(std::string uri, rest_request_type method, http_callback callback, json *argument) {
-        // Get current time
-    uint64_t now = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-    if((now - last_request) > CONCORDPP_MAX_REQUEST_INTERVAL) {
-        reset_connection();
-        std::cout << "Resetting HTTP/REST connection to avoid timeout." << std::endl;
-    }
-    perform_request(uri, method, callback, argument);
+void rest_client::api_call(std::string uri, rest_request_type method, http_callback callback, nlohmann::json argument) {
+    http_thread_count++;
+    boost::thread t = boost::thread(boost::bind(&rest_client::perform_request, this, uri, method, callback, argument));
+    t.detach();
 }
 
-void rest_client::perform_request(std::string uri, rest_request_type method, http_callback callback, nlohmann::json *argument) {
+void rest_client::perform_request(std::string uri, rest_request_type method, http_callback callback, nlohmann::json argument) {
+    RestClient::Connection rest_conn = RestClient::Connection("https://discordapp.com/api");
+    rest_conn.SetTimeout(5);
+    rest_conn.FollowRedirects(true);
+    rest_conn.SetUserAgent("NirvanaBot (none, 0.1)");
+    rest_conn.AppendHeader("Authorization", "Bot " + token);
     RestClient::Response response;
     switch(method) {
         case GET:
-            response = http_conn->get(uri);
+            response = rest_conn.get(uri);
             break;
         case POST:
-            response = http_conn->post(uri, argument->dump());
+            response = rest_conn.post(uri, argument.dump());
             break;
         case PUT:
-            response = http_conn->put(uri, argument->dump());
+            response = rest_conn.put(uri, argument.dump());
             break;
         case DELETE:
-            response = http_conn->del(uri);
+            response = rest_conn.del(uri);
             break;
     }
-    last_request = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
     callback(response.code, nlohmann::json::parse(response.body));
+    http_thread_count--;
 }
