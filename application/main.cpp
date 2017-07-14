@@ -2,6 +2,7 @@
 #include "rest_client.h"
 #include <json.hpp>
 #include <iostream>
+#include <ctime>
 
 int quit = 0;
 concordpp::rest_client *d_rest;
@@ -51,6 +52,14 @@ int main(int argc, char* argv[]) {
     d_gateway->add_callback("MESSAGE_CREATE", [](nlohmann::json data){
         if(data["content"] == "lambda") {
             d_rest->create_message(data["channel_id"], "Lambda test done.");
+        }
+    });
+    d_gateway->add_callback("MESSAGE_CREATE", [](nlohmann::json data) {
+        std::string arg = data["content"];
+        std::string cmd = arg.substr(0, arg.find(' '));
+        if(cmd != arg && cmd == "game") {
+            std::string remainder = arg.substr(arg.find(' ') + 1, std::string::npos);
+            d_gateway->set_status(remainder, std::time(0));
         }
     });
     d_gateway->connect();   // Blocking call

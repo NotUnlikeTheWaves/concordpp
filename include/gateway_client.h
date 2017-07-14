@@ -2,7 +2,6 @@
 #define GATEWAY_CLIENT_H
 
 #include <string>
-
 #include "gateway/web_socket.h"
 #include "gateway/callback_handler.h"
 
@@ -16,8 +15,9 @@ namespace concordpp {
 
             // Event handler/callback manager
         void add_callback(std::string event_name, std::function<void(nlohmann::json)> callback);
-            // ========== gateway methods ========== //
 
+            // ========== gateway methods ========== //
+        void set_status(std::string playing, std::time_t idle_since = -1);
 
     private:
         std::string token;

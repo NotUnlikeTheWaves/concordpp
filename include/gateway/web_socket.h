@@ -4,8 +4,8 @@
 #include <websocketpp/config/asio_client.hpp>
 #include <websocketpp/client.hpp>
 #include <boost/thread/thread.hpp>
-
 #include "gateway/callback_handler.h"
+
 namespace concordpp {
     typedef websocketpp::client<websocketpp::config::asio_tls_client> web_socket_client;
     typedef websocketpp::config::asio_tls_client::message_type::ptr message_ptr;
@@ -18,6 +18,8 @@ namespace concordpp {
         ~web_socket();
         void start();
         void stop();
+        void send(std::string data);
+
     private:
         std::string *token; // Keep pointer to token in gateway_client.h
         int last_sequence_number;

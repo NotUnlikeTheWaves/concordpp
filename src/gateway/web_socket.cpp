@@ -2,7 +2,6 @@
 #include <websocketpp/client.hpp>
 #include <json.hpp>
 #include <iostream>
-
 #include "gateway/web_socket.h"
 
 using namespace concordpp;
@@ -151,4 +150,8 @@ void web_socket::send_heartbeat() {
         std::cout << "Sent heartbeat" << std::endl;
         boost::this_thread::sleep_for(boost::chrono::milliseconds(heartbeat_interval));
     }
+}
+
+void web_socket::send(std::string data) {
+    client.send(persistent_hdl, data, websocketpp::frame::opcode::text);
 }

@@ -1,5 +1,6 @@
-#include "gateway_client.h"
 #include <iostream>
+#include <json.hpp>
+#include "gateway_client.h"
 
 using namespace concordpp;
 using json = nlohmann::json;
@@ -28,4 +29,13 @@ void gateway_client::stop() {
 
 void gateway_client::add_callback(std::string event_name, std::function<void(json)> callback) {
     cb_handler.add_callback(event_name, callback);
+}
+
+void gateway_client::set_status(std::string playing, std::time_t idle_since) {
+    json data;
+    data["op"] = 3;
+    if(idle_since == -1) data["d"]["idle_since"] = NULL;
+    else data["d"]["idle_since"] = idle_since;
+    data["d"]["game"]["name"] = playing;
+    socket->send(data.dump());
 }
