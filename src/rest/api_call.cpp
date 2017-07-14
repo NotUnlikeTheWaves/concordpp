@@ -33,6 +33,16 @@ void rest_client::perform_request(std::string uri, rest_request_type method, htt
             response = rest_conn.del(uri);
             break;
     }
-    callback(response.code, nlohmann::json::parse(response.body));
+    try {
+        callback(response.code, nlohmann::json::parse(response.body));
+    } catch(const nlohmann::json::parse_error e) {
+        std::cout << "Trouble: JSON Parse Error (API CALL):" << std::endl;
+        std::cout << response.code << std::endl;
+        std::cout << response.body << std::endl;
+        for(auto e : response.headers) {
+            std::cout << e.first << " - " << e.second << std::endl;
+        }
+        std::cout << "Out of API CALL." << std::endl;
+    }
     http_thread_count--;
 }
