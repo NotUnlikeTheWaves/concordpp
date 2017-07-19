@@ -7,12 +7,12 @@ using namespace concordpp;
 using json = nlohmann::json;
 
 void rest_client::api_call(std::string uri, rest_request_type method, http_callback callback, nlohmann::json argument) {
-    http_thread_count++;
     boost::thread t = boost::thread(boost::bind(&rest_client::perform_request, this, uri, method, callback, argument));
     t.detach();
 }
 
 void rest_client::perform_request(std::string uri, rest_request_type method, http_callback callback, nlohmann::json argument) {
+    http_thread_count++;
     RestClient::Connection rest_conn = RestClient::Connection("https://discordapp.com/api");
     rest_conn.SetTimeout(5);
     rest_conn.FollowRedirects(true);
@@ -34,7 +34,15 @@ void rest_client::perform_request(std::string uri, rest_request_type method, htt
             break;
     }
     try {
-        callback(response.code, nlohmann::json::parse(response.body));
+        json message = json::parse(response.body);
+        if(response.code == 429) {  // Being rate limited
+            int wait_for = message["retry_after"].get<int>();
+            std::cout << "Rate limited. Retrying after " << wait_for << std::endl;
+            boost::this_thread::sleep(boost::posix_time::milliseconds(wait_for));
+            std::cout << "Retrying REST API call after rate limiting." << std::endl;
+            perform_request(uri, method, callback, argument);
+        }
+        else callback(response.code, message);
     } catch(const nlohmann::json::parse_error e) {
         std::cout << "Trouble: JSON Parse Error (API CALL):" << std::endl;
         std::cout << response.code << std::endl;
