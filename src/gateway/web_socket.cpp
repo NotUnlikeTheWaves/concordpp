@@ -1,8 +1,8 @@
 #include <websocketpp/config/asio_client.hpp>
 #include <websocketpp/client.hpp>
 #include <json.hpp>
-#include <iostream>
 #include "gateway/web_socket.h"
+#include "internal/debug.h"
 
 using namespace concordpp;
 using json = nlohmann::json;
@@ -58,10 +58,11 @@ void web_socket::stop() {
 }
 
 void web_socket::on_socket_init(websocketpp::connection_hdl) {
-    std::cout << "Socket init." << std::endl;
+    debug::log(debug::log_level::ALL, debug::log_origin::GATEWAY, "on_socket_init() called");
 }
 
 context_ptr web_socket::on_tls_init(websocketpp::connection_hdl) {
+    debug::log(debug::log_level::ALL, debug::log_origin::GATEWAY, "on_tls_init() called");
     context_ptr ctx = websocketpp::lib::make_shared<boost::asio::ssl::context>(boost::asio::ssl::context::tlsv12);
     try {
         ctx->set_options(boost::asio::ssl::context::default_workarounds |
@@ -70,7 +71,8 @@ context_ptr web_socket::on_tls_init(websocketpp::connection_hdl) {
                          boost::asio::ssl::context::single_dh_use);
         ctx->set_verify_mode(0);    // check if needed
     } catch (std::exception& e) {
-        std::cout << e.what() << std::endl;
+        std::string error = e.what();
+        debug::log(debug::log_level::IMPORTANT, debug::log_origin::GATEWAY, ("Exception in TLS init: " + error));
     }
     ctx->set_verify_mode(0);
     return ctx;
@@ -78,36 +80,33 @@ context_ptr web_socket::on_tls_init(websocketpp::connection_hdl) {
 
 void web_socket::on_fail(websocketpp::connection_hdl hdl) {
     web_socket_client::connection_ptr con = client.get_con_from_hdl(hdl);
-    std::cout << "Fail handler" << std::endl;
-    std::cout << con->get_state() << std::endl;
-    std::cout << con->get_local_close_code() << std::endl;
-    std::cout << con->get_local_close_reason() << std::endl;
-    std::cout << con->get_remote_close_code() << std::endl;
-    std::cout << con->get_remote_close_reason() << std::endl;
-    std::cout << con->get_ec() << " - " << con->get_ec().message() << std::endl;
+    std::string fail_string = "Failure in web socket:\nState: " + std::to_string(con->get_state()) + "\n" \
+    + "Local close code: " + std::to_string(con->get_local_close_code()) + "\n" \
+    + "Local close reason: " + con->get_local_close_reason() + "\n" \
+    + "Remote close code: " + std::to_string(con->get_remote_close_code()) + "\n" \
+    + "Remote close reason: " + con->get_remote_close_reason() + "\n";
+    + "Error msg: " + con->get_ec().message();
+    debug::log(debug::log_level::IMPORTANT, debug::log_origin::GATEWAY, fail_string);
 }
 
 void web_socket::on_open(websocketpp::connection_hdl hdl) {
-    std::cout << "Connection opened." << std::endl;
+    debug::log(debug::log_level::ALL, debug::log_origin::GATEWAY, "on_open() called");
 }
 void web_socket::on_message(websocketpp::connection_hdl hdl, message_ptr msg) {
-    std::cout << "Message received!" << std::endl;
     std::string message = msg->get_payload();
-    std::cout << "Message gotten!" << std::endl;
-    std::cout << message << std::endl;
-    std::cout << "Message printed!" << std::endl;
     json json_msg = json::parse(message);
+    debug::log(debug::log_level::ALL, debug::log_origin::GATEWAY, "on_message called:\n" + json_msg.dump(4));
 
     if(!json_msg["s"].is_null()) {
-            std::cout << "S is NOT NULL" << std::endl;
             last_sequence_number = json_msg["s"].get<int>();
-    } else std::cout << "S == NULL !!!" << std::endl;
+    }
 
+    int op_code = json_msg["op"].get<int>();
     switch(json_msg["op"].get<int>()) {
         case 0 : {
             std::string event = json_msg["t"];
             if(event == "READY") {
-                std::cout <<  "Ready event!" << std::endl;
+                debug::log(debug::log_level::INFORMATIONAL, debug::log_origin::GATEWAY, "READY event received");
                 persistent_hdl = hdl;
                 heartbeat_thread = new boost::thread(boost::bind(&web_socket::send_heartbeat, this));
             }
@@ -115,21 +114,19 @@ void web_socket::on_message(websocketpp::connection_hdl hdl, message_ptr msg) {
             break;
         }
         case 10: {
+            debug::log(debug::log_level::INFORMATIONAL, debug::log_origin::GATEWAY, "Hello OPcode received, identifying");
             heartbeat_interval = json_msg["d"]["heartbeat_interval"].get<int>();
-            std::cout << std::endl << "IDENTIFY NOW!" << std::endl << std::endl;
             json identify;
             identify["op"] = 2;
             identify["d"]["token"] = (*token);
             identify["d"]["properties"]["$os"] = "Linux";
             identify["d"]["compress"] = false;
             identify["d"]["large_threshold"] = 50;
-            std::cout << "Token from memory: " << *token << std::endl;
-            //identify["d"]["shard"] = {1, 1};
             client.send(hdl, identify.dump(), websocketpp::frame::opcode::text);
             break;
         }
         default: {
-            std::cout << "Unimplemented opcode: " << json_msg["op"] << std::endl;
+            debug::log(debug::log_level::INFORMATIONAL, debug::log_origin::GATEWAY, "Unimplemented opcode: " + std::to_string(op_code));
             break;
         }
     }
@@ -138,7 +135,7 @@ void web_socket::on_message(websocketpp::connection_hdl hdl, message_ptr msg) {
 }
 
 void web_socket::on_close(websocketpp::connection_hdl) {
-    std::cout << "WS Closing." << std::endl;
+    debug::log(debug::log_level::INFORMATIONAL, debug::log_origin::GATEWAY, "on_close() called");
 }
 
 void web_socket::send_heartbeat() {
@@ -147,7 +144,7 @@ void web_socket::send_heartbeat() {
     while(true) {
         heartbeat["d"] = last_sequence_number;
         client.send(persistent_hdl, heartbeat.dump(), websocketpp::frame::opcode::text);
-        std::cout << "Sent heartbeat" << std::endl;
+        debug::log(debug::log_level::INFORMATIONAL, debug::log_origin::GATEWAY, "Sending heartbeat");
         boost::this_thread::sleep_for(boost::chrono::milliseconds(heartbeat_interval));
     }
 }

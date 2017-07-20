@@ -1,5 +1,4 @@
-#include "gateway_client.h"
-#include "rest_client.h"
+#include "concordpp.h"
 #include <json.hpp>
 #include <iostream>
 #include <ctime>
@@ -47,6 +46,7 @@ void on_message(nlohmann::json data) {
 }
 
 int main(int argc, char* argv[]) {
+    concordpp::debug::set_log_level(concordpp::debug::log_level::ALL);
     d_gateway = new concordpp::gateway_client("MzAwMzg2MTQ2OTQ3NDMyNDQ4.DApDZg.W5G01s0dGHJV9NgIVETQCZ3c_WE");
     d_rest = new concordpp::rest_client("MzAwMzg2MTQ2OTQ3NDMyNDQ4.DApDZg.W5G01s0dGHJV9NgIVETQCZ3c_WE");
     d_gateway->add_callback("MESSAGE_CREATE", on_message);

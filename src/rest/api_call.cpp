@@ -1,5 +1,5 @@
 #include "rest_client.h"
-#include <iostream>
+#include "internal/debug.h"
     // Max interval between requests in milliseconds
 #define CONCORDPP_MAX_REQUEST_INTERVAL 60000
 
@@ -37,20 +37,19 @@ void rest_client::perform_request(std::string uri, rest_request_type method, htt
         json message = json::parse(response.body);
         if(response.code == 429) {  // Being rate limited
             int wait_for = message["retry_after"].get<int>();
-            std::cout << "Rate limited. Retrying after " << wait_for << std::endl;
+            debug::log(debug::log_level::INFORMATIONAL, debug::log_origin::REST, "API request exceeds rate limts. Retrying in " + std::to_string(wait_for) + "ms");
             boost::this_thread::sleep(boost::posix_time::milliseconds(wait_for));
-            std::cout << "Retrying REST API call after rate limiting." << std::endl;
             perform_request(uri, method, callback, argument);
         }
         else callback(response.code, message);
     } catch(const nlohmann::json::parse_error e) {
-        std::cout << "Trouble: JSON Parse Error (API CALL):" << std::endl;
-        std::cout << response.code << std::endl;
-        std::cout << response.body << std::endl;
+        std::string error = "Trouble: JSON Parse Error (API CALL):\n" \
+        + std::to_string(response.code) + "\n" \
+        + response.body + "\n";
         for(auto e : response.headers) {
-            std::cout << e.first << " - " << e.second << std::endl;
+            error = error + e.first + " - " + e.second + "\n";
         }
-        std::cout << "Out of API CALL." << std::endl;
+        debug::log(debug::log_level::IMPORTANT, debug::log_origin::REST, error);
     }
     http_thread_count--;
 }

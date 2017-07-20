@@ -1,6 +1,6 @@
-#include <iostream>
 #include <json.hpp>
 #include "gateway_client.h"
+#include "internal/debug.h"
 
 using namespace concordpp;
 using json = nlohmann::json;
@@ -8,7 +8,6 @@ using json = nlohmann::json;
 gateway_client::gateway_client(std::string token) {
     this->token = token;
     socket = NULL;
-    std::cout << "Done init client" << std::endl;
 }
 
 gateway_client::~gateway_client() {
@@ -18,8 +17,9 @@ gateway_client::~gateway_client() {
 }
 
 void gateway_client::connect() {
-    std::cout << "Connect function" << std::endl;
+    debug::log(debug::log_level::INFORMATIONAL, debug::log_origin::GATEWAY, "Setting up gateway client");
     socket = new web_socket(&(this->token), &cb_handler);
+    debug::log(debug::log_level::INFORMATIONAL, debug::log_origin::GATEWAY, "Starting gateway client");
     socket->start();
 }
 
