@@ -20,7 +20,15 @@ namespace concordpp {
         void set_status(std::string playing, std::time_t idle_since = -1);
 
     private:
+        enum connection_state {
+            NORMAL,     // Send identify
+            RECONNECT,  // Try resume, otherwise identify
+            CLOSE,      // Don't reconnect
+        };
+        connection_state gateway_connect_state;
         std::string token;
+        std::string session_id;
+        int last_sequence_number;
         web_socket *socket;
         callback_handler cb_handler;
     };

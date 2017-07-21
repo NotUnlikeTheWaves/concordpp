@@ -8,6 +8,7 @@ using json = nlohmann::json;
 gateway_client::gateway_client(std::string token) {
     this->token = token;
     socket = NULL;
+    gateway_connect_state = NORMAL;
 }
 
 gateway_client::~gateway_client() {
@@ -17,13 +18,34 @@ gateway_client::~gateway_client() {
 }
 
 void gateway_client::connect() {
-    debug::log(debug::log_level::INFORMATIONAL, debug::log_origin::GATEWAY, "Setting up gateway client");
-    socket = new web_socket(&(this->token), &cb_handler);
-    debug::log(debug::log_level::INFORMATIONAL, debug::log_origin::GATEWAY, "Starting gateway client");
-    socket->start();
+    bool reconnect = false;
+        // should move to session struct
+    session_id = "";
+    last_sequence_number = 0;
+    while(gateway_connect_state != CLOSE) {
+        debug::log(debug::log_level::INFORMATIONAL, debug::log_origin::GATEWAY, "Setting up gateway client");
+        if(reconnect == false) {
+            debug::log(debug::log_level::INFORMATIONAL, debug::log_origin::GATEWAY, "Gateway route: normal");
+            socket = new web_socket(&(this->token), &cb_handler);
+        } else {
+            debug::log(debug::log_level::INFORMATIONAL, debug::log_origin::GATEWAY, "Gateway route: reconnecting with session id: " + session_id);
+            socket = new web_socket(&(this->token), &cb_handler, web_socket::connection_type::RECONNECT);
+            socket->set_session(session_id, last_sequence_number);
+        }
+        debug::log(debug::log_level::INFORMATIONAL, debug::log_origin::GATEWAY, "Starting gateway client");
+        socket->start();
+        debug::log(debug::log_level::INFORMATIONAL, debug::log_origin::GATEWAY, "Client stopped.");
+            // Instructions reached when socket is exited
+        if(gateway_connect_state != CLOSE) {
+            session_id = socket->get_session_id();
+            last_sequence_number = socket->get_sequence_number();
+            reconnect = true;
+        }
+    }
 }
 
 void gateway_client::stop() {
+    gateway_connect_state = CLOSE;
     socket->stop();
 }
 

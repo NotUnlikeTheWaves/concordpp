@@ -10,11 +10,12 @@ using websocketpp::lib::placeholders::_1;
 using websocketpp::lib::placeholders::_2;
 using websocketpp::lib::bind;
 
-web_socket::web_socket(std::string *token, callback_handler *cb_handler) {
+web_socket::web_socket(std::string *token, callback_handler *cb_handler, connection_type route) {
     this->token = token;
     this->cb_handler = cb_handler;
     last_sequence_number = 0;
     heartbeat_thread = NULL;
+    connection_route = route;
 
     client.init_asio();
     client.set_access_channels(websocketpp::log::alevel::all); //check
@@ -48,13 +49,26 @@ void web_socket::start() {
     client.run();
 }
 
-void web_socket::stop() {
+void web_socket::stop(ws_close_code reason) {
     if(heartbeat_thread != NULL) {
         heartbeat_thread->interrupt();
         heartbeat_thread->join();
         delete heartbeat_thread;
     }
-    client.close(persistent_hdl, websocketpp::close::status::normal, "");
+    client.close(persistent_hdl, reason, "");
+}
+
+void web_socket::set_session(std::string session_id, int sequence_number) {
+    last_sequence_number = sequence_number;
+    this->session_id = session_id;
+}
+
+std::string web_socket::get_session_id() {
+    return session_id;
+}
+
+int web_socket::get_sequence_number() {
+    return last_sequence_number;
 }
 
 void web_socket::on_socket_init(websocketpp::connection_hdl) {
@@ -90,6 +104,7 @@ void web_socket::on_fail(websocketpp::connection_hdl hdl) {
 }
 
 void web_socket::on_open(websocketpp::connection_hdl hdl) {
+    persistent_hdl = hdl;
     debug::log(debug::log_level::ALL, debug::log_origin::GATEWAY, "on_open() called");
 }
 void web_socket::on_message(websocketpp::connection_hdl hdl, message_ptr msg) {
@@ -103,26 +118,38 @@ void web_socket::on_message(websocketpp::connection_hdl hdl, message_ptr msg) {
 
     int op_code = json_msg["op"].get<int>();
     switch(json_msg["op"].get<int>()) {
-        case 0 : {
+        case 0: {   // dispatch
             std::string event = json_msg["t"];
-            if(event == "READY") {
+            if(event == "READY") {  // note to self: move this to its own callback
                 debug::log(debug::log_level::INFORMATIONAL, debug::log_origin::GATEWAY, "READY event received");
-                persistent_hdl = hdl;
-                heartbeat_thread = new boost::thread(boost::bind(&web_socket::send_heartbeat, this));
+                session_id = json_msg["d"]["session_id"];
             }
             cb_handler->handle_event(event, json_msg["d"]);
             break;
         }
-        case 10: {
+        case 7: {   // reconnect
+            stop(websocketpp::close::status::try_again_later); // stop everything, return to main loop in gateway client, then reconnect.
+            return;
+        }
+        case 9: {
+                // Can't connect properly, so just identify. Wait for 5 seconds according to discord reference.
+            debug::log(debug::log_level::INFORMATIONAL, debug::log_origin::GATEWAY, "Failed to resume session. Identifying instead.");
+            boost::this_thread::sleep_for(boost::chrono::milliseconds(5000));
+            identify();
+            break;
+        }
+        case 10: {  // hello
             debug::log(debug::log_level::INFORMATIONAL, debug::log_origin::GATEWAY, "Hello OPcode received, identifying");
             heartbeat_interval = json_msg["d"]["heartbeat_interval"].get<int>();
-            json identify;
-            identify["op"] = 2;
-            identify["d"]["token"] = (*token);
-            identify["d"]["properties"]["$os"] = "Linux";
-            identify["d"]["compress"] = false;
-            identify["d"]["large_threshold"] = 50;
-            client.send(hdl, identify.dump(), websocketpp::frame::opcode::text);
+            heartbeat_thread = new boost::thread(boost::bind(&web_socket::send_heartbeat, this));
+            switch(connection_route) {
+                case NORMAL:
+                    identify();
+                    break;
+                case RECONNECT:
+                    resume();
+                    break;
+            }
             break;
         }
         default: {
@@ -132,6 +159,25 @@ void web_socket::on_message(websocketpp::connection_hdl hdl, message_ptr msg) {
     }
 
 
+}
+
+void web_socket::identify() {
+    json identify;
+    identify["op"] = 2;
+    identify["d"]["token"] = (*token);
+    identify["d"]["properties"]["$os"] = "Linux";
+    identify["d"]["compress"] = false;
+    identify["d"]["large_threshold"] = 50;
+    client.send(persistent_hdl, identify.dump(), websocketpp::frame::opcode::text);
+}
+
+void web_socket::resume() {
+    json resume;
+    resume["op"] = 6;
+    resume["d"]["token"] = (*token);
+    resume["d"]["session_id"] = session_id;
+    resume["d"]["seq"] = last_sequence_number;
+    client.send(persistent_hdl, resume.dump(), websocketpp::frame::opcode::text);
 }
 
 void web_socket::on_close(websocketpp::connection_hdl) {
