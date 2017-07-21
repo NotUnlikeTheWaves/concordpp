@@ -32,6 +32,7 @@ namespace concordpp {
         std::string session_id;
         int last_sequence_number;
         int heartbeat_interval;
+        bool heartbeat_received;
         connection_type connection_route;
 
         boost::thread *heartbeat_thread;

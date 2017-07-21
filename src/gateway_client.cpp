@@ -12,6 +12,9 @@ gateway_client::gateway_client(std::string token) {
 }
 
 gateway_client::~gateway_client() {
+    if(gateway_connect_state != CLOSE) {
+        stop();
+    }
     if(socket != NULL) {
         delete socket;
     }
@@ -41,6 +44,7 @@ void gateway_client::connect() {
             last_sequence_number = socket->get_sequence_number();
             reconnect = true;
         }
+        delete socket;
     }
 }
 

@@ -43,6 +43,11 @@ web_socket::web_socket(std::string *token, callback_handler *cb_handler, connect
 }
 
 web_socket::~web_socket() {
+    if(heartbeat_thread != NULL) {
+        heartbeat_thread->interrupt();
+        heartbeat_thread->join();
+        delete heartbeat_thread;
+    }
 }
 
 void web_socket::start() {
@@ -50,11 +55,6 @@ void web_socket::start() {
 }
 
 void web_socket::stop(ws_close_code reason) {
-    if(heartbeat_thread != NULL) {
-        heartbeat_thread->interrupt();
-        heartbeat_thread->join();
-        delete heartbeat_thread;
-    }
     client.close(persistent_hdl, reason, "");
 }
 
@@ -152,6 +152,10 @@ void web_socket::on_message(websocketpp::connection_hdl hdl, message_ptr msg) {
             }
             break;
         }
+        case 11: {
+            heartbeat_received = true;
+            break;
+        }
         default: {
             debug::log(debug::log_level::INFORMATIONAL, debug::log_origin::GATEWAY, "Unimplemented opcode: " + std::to_string(op_code));
             break;
@@ -185,9 +189,15 @@ void web_socket::on_close(websocketpp::connection_hdl) {
 }
 
 void web_socket::send_heartbeat() {
+    heartbeat_received = true;
     json heartbeat;
     heartbeat["op"] = 1;    // Heartbeat OP
     while(true) {
+        if(heartbeat_received == false) {
+            stop(websocketpp::close::status::try_again_later);
+            break;
+        }
+        heartbeat_received = false;
         heartbeat["d"] = last_sequence_number;
         client.send(persistent_hdl, heartbeat.dump(), websocketpp::frame::opcode::text);
         debug::log(debug::log_level::INFORMATIONAL, debug::log_origin::GATEWAY, "Sending heartbeat");
