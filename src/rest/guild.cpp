@@ -1,6 +1,6 @@
 #include "rest_client.h"
 
-using namespace concordpp;
+using namespace concordpp::rest;
 using json = nlohmann::json;
 
 void rest_client::get_guild_channels(snowflake guild, http_callback callback) {

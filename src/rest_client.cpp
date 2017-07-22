@@ -1,6 +1,6 @@
 #include "rest_client.h"
 
-using namespace concordpp;
+using namespace concordpp::rest;
 
 rest_client::rest_client(std::string token) {
     this->token = token;

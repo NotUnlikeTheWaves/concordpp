@@ -3,7 +3,7 @@
     // Max interval between requests in milliseconds
 #define CONCORDPP_MAX_REQUEST_INTERVAL 60000
 
-using namespace concordpp;
+using namespace concordpp::rest;
 using json = nlohmann::json;
 
 void rest_client::api_call(std::string uri, rest_request_type method, http_callback callback, nlohmann::json argument) {

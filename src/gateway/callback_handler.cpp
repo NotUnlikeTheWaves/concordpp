@@ -1,6 +1,6 @@
 #include "gateway/callback_handler.h"
 
-using namespace concordpp;
+using namespace concordpp::gateway;
 using json = nlohmann::json;
 
 callback_handler::~callback_handler() {

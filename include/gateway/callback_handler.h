@@ -3,14 +3,16 @@
 #include "gateway/callback.h"
 #include <vector>
 namespace concordpp {
-    class callback_handler {
-    public:
-        ~callback_handler();
-        void add_callback(std::string event_name, std::function<void(nlohmann::json)> callback);
-        void handle_event(std::string event_name, nlohmann::json data);
-    private:
-        std::vector<event_callback*> callbacks;
-    };
+    namespace gateway {
+        class callback_handler {
+        public:
+            ~callback_handler();
+            void add_callback(std::string event_name, std::function<void(nlohmann::json)> callback);
+            void handle_event(std::string event_name, nlohmann::json data);
+        private:
+            std::vector<event_callback*> callbacks;
+        };
+    }
 }
 
 #endif

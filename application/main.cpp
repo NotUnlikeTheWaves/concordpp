@@ -4,8 +4,8 @@
 #include <ctime>
 
 int quit = 0;
-concordpp::rest_client *d_rest;
-concordpp::gateway_client *d_gateway;
+concordpp::rest::rest_client *d_rest;
+concordpp::gateway::gateway_client *d_gateway;
 
 void on_message(nlohmann::json data) {
     if(data["content"] == "test me") {
@@ -46,9 +46,9 @@ void on_message(nlohmann::json data) {
 }
 
 int main(int argc, char* argv[]) {
-    concordpp::debug::set_log_level(concordpp::debug::log_level::ALL);
-    d_gateway = new concordpp::gateway_client("MzAwMzg2MTQ2OTQ3NDMyNDQ4.DApDZg.W5G01s0dGHJV9NgIVETQCZ3c_WE");
-    d_rest = new concordpp::rest_client("MzAwMzg2MTQ2OTQ3NDMyNDQ4.DApDZg.W5G01s0dGHJV9NgIVETQCZ3c_WE");
+    concordpp::debug::set_log_level(concordpp::debug::log_level::INFORMATIONAL);
+    d_gateway = new concordpp::gateway::gateway_client("MzAwMzg2MTQ2OTQ3NDMyNDQ4.DApDZg.W5G01s0dGHJV9NgIVETQCZ3c_WE");
+    d_rest = new concordpp::rest::rest_client("MzAwMzg2MTQ2OTQ3NDMyNDQ4.DApDZg.W5G01s0dGHJV9NgIVETQCZ3c_WE");
     d_gateway->add_callback("MESSAGE_CREATE", on_message);
     d_gateway->add_callback("MESSAGE_CREATE", [](nlohmann::json data){
         if(data["content"] == "lambda") {
@@ -60,7 +60,7 @@ int main(int argc, char* argv[]) {
         std::string cmd = arg.substr(0, arg.find(' '));
         if(cmd != arg && cmd == "game") {
             std::string remainder = arg.substr(arg.find(' ') + 1, std::string::npos);
-            d_gateway->set_status(remainder, std::time(0));
+            d_gateway->set_status(concordpp::gateway::status_types::DO_NOT_DISTURB, remainder);
         }
     });
     d_gateway->connect();   // Blocking call

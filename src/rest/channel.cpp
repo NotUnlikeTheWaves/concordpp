@@ -1,6 +1,6 @@
 #include "rest_client.h"
 
-using namespace concordpp;
+using namespace concordpp::rest;
 using json = nlohmann::json;
 
 void rest_client::create_message(snowflake channel, std::string message, http_callback callback) {

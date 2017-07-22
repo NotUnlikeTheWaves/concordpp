@@ -6,32 +6,42 @@
 #include "gateway/callback_handler.h"
 
 namespace concordpp {
-    class gateway_client {
-    public:
-        gateway_client(std::string token);
-        ~gateway_client();
-        void connect();
-        void stop();
+    namespace gateway {
+        namespace status_types {
+            typedef std::string status;
+            static const status ONLINE = "online";
+            static const status DO_NOT_DISTURB = "dnd";
+            static const status IDLE = "idle";
+            static const status INVISIBLE = "invisible";
+            static const status OFFLINE = "offline";
+        }
+        class gateway_client {
+        public:
+            gateway_client(std::string token);
+            ~gateway_client();
+            void connect();
+            void stop();
 
-            // Event handler/callback manager
-        void add_callback(std::string event_name, std::function<void(nlohmann::json)> callback);
+                // Event handler/callback manager
+            void add_callback(std::string event_name, std::function<void(nlohmann::json)> callback);
 
-            // ========== gateway methods ========== //
-        void set_status(std::string playing, std::time_t idle_since = -1);
+                // ========== gateway methods ========== //
+            void set_status(concordpp::gateway::status_types::status status, std::string playing, bool afk = false, std::time_t idle_since = -1);
 
-    private:
-        enum connection_state {
-            NORMAL,     // Send identify
-            RECONNECT,  // Try resume, otherwise identify
-            CLOSE,      // Don't reconnect
+        private:
+            enum connection_state {
+                NORMAL,     // Send identify
+                RECONNECT,  // Try resume, otherwise identify
+                CLOSE,      // Don't reconnect
+            };
+            connection_state gateway_connect_state;
+            std::string token;
+            std::string session_id;
+            int last_sequence_number;
+            web_socket *socket;
+            callback_handler cb_handler;
         };
-        connection_state gateway_connect_state;
-        std::string token;
-        std::string session_id;
-        int last_sequence_number;
-        web_socket *socket;
-        callback_handler cb_handler;
-    };
+    }
 }
 
 #endif

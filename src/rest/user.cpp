@@ -1,6 +1,6 @@
 #include "rest_client.h"
 
-using namespace concordpp;
+using namespace concordpp::rest;
 using json = nlohmann::json;
 
 void rest_client::get_current_user_guilds(http_callback callback) {

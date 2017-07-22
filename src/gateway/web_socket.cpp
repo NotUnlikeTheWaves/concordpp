@@ -4,7 +4,7 @@
 #include "gateway/web_socket.h"
 #include "internal/debug.h"
 
-using namespace concordpp;
+using namespace concordpp::gateway;
 using json = nlohmann::json;
 using websocketpp::lib::placeholders::_1;
 using websocketpp::lib::placeholders::_2;
@@ -30,7 +30,7 @@ web_socket::web_socket(std::string *token, callback_handler *cb_handler, connect
     client.set_fail_handler(bind(&web_socket::on_fail,this,::_1));
     client.set_user_agent("");
 
-    std::string uri = "wss://gateway.discord.gg/?v=5&encoding=json";
+    std::string uri = "wss://gateway.discord.gg/?v=6&encoding=json";
     websocketpp::lib::error_code ec;
     web_socket_client::connection_ptr con = client.get_connection(uri, ec);
 
@@ -44,8 +44,10 @@ web_socket::web_socket(std::string *token, callback_handler *cb_handler, connect
 
 web_socket::~web_socket() {
     if(heartbeat_thread != NULL) {
-        heartbeat_thread->interrupt();
-        heartbeat_thread->join();
+        if(heartbeat_is_running == true) {
+            heartbeat_thread->interrupt();
+            heartbeat_thread->join();
+        }
         delete heartbeat_thread;
     }
 }
@@ -189,6 +191,7 @@ void web_socket::on_close(websocketpp::connection_hdl) {
 }
 
 void web_socket::send_heartbeat() {
+    heartbeat_is_running = true;
     heartbeat_received = true;
     json heartbeat;
     heartbeat["op"] = 1;    // Heartbeat OP
@@ -203,6 +206,7 @@ void web_socket::send_heartbeat() {
         debug::log(debug::log_level::INFORMATIONAL, debug::log_origin::GATEWAY, "Sending heartbeat");
         boost::this_thread::sleep_for(boost::chrono::milliseconds(heartbeat_interval));
     }
+    heartbeat_is_running = false;
 }
 
 void web_socket::send(std::string data) {
