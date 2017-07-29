@@ -12,8 +12,11 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/json)
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/websocketpp)
 
-include_directories(./include ${CMAKE_CURRENT_SOURCE_DIR}/libs/websocketpp)
 
 file(GLOB_RECURSE SOURCES "src/*.cpp")
-add_executable(runfile application/main.cpp ${SOURCES})
-target_link_libraries(runfile ${PROJECT_LINK_LIBS} ${Boost_LIBRARIES} ${OPENSSL_LIBRARIES} pthread boost_thread restclient-cpp curl nlohmann_json)
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/libs/websocketpp)
+
+add_library(concordpp ${SOURCES})
+target_include_directories(concordpp INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/libs/websocketpp)
+target_link_libraries(concordpp ${PROJECT_LINK_LIBS} ${Boost_LIBRARIES} ${OPENSSL_LIBRARIES} pthread boost_thread restclient-cpp curl nlohmann_json)
