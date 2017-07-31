@@ -11,6 +11,7 @@ set(BuildTests OFF CACHE INTERNAL "" FORCE)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/json)
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/websocketpp)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/restclient-cpp)
 
 
 file(GLOB_RECURSE SOURCES "src/*.cpp")

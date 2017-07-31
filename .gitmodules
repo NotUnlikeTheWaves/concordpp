@@ -6,4 +6,4 @@
 	url = https://github.com/zaphoyd/websocketpp
 [submodule "libs/restclient-cpp"]
 	path = libs/restclient-cpp
-	url = https://github.com/mrtazz/restclient-cpp
+	url = https://github.com/hiddos/restclient-cpp
