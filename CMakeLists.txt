@@ -8,7 +8,6 @@ find_package(OpenSSL REQUIRED openssl)
 
 # Disable tests for JSON
 set(BuildTests OFF CACHE INTERNAL "" FORCE)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/json)
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/websocketpp)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/restclient-cpp)
@@ -16,8 +15,8 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/restclient-cpp)
 
 file(GLOB_RECURSE SOURCES "src/*.cpp")
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/libs/websocketpp)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/libs/websocketpp ${CMAKE_CURRENT_SOURCE_DIR}/libs/json)
 
 add_library(concordpp ${SOURCES})
-target_include_directories(concordpp INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/libs/websocketpp)
-target_link_libraries(concordpp ${PROJECT_LINK_LIBS} ${Boost_LIBRARIES} ${OPENSSL_LIBRARIES} pthread boost_thread restclient-cpp curl nlohmann_json)
+target_include_directories(concordpp INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/libs/websocketpp ${CMAKE_CURRENT_SOURCE_DIR}/libs/json)
+target_link_libraries(concordpp ${PROJECT_LINK_LIBS} ${Boost_LIBRARIES} ${OPENSSL_LIBRARIES} pthread boost_thread restclient-cpp curl)
