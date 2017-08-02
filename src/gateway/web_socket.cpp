@@ -18,8 +18,8 @@ web_socket::web_socket(std::string *token, callback_handler *cb_handler, connect
     connection_route = route;
 
     client.init_asio();
-    client.set_access_channels(websocketpp::log::alevel::all); //check
-    client.set_error_channels(websocketpp::log::elevel::all);
+    client.set_access_channels(websocketpp::log::alevel::none);
+    client.set_error_channels(websocketpp::log::elevel::none);
 
     // Register our handlers
     client.set_socket_init_handler(bind(&web_socket::on_socket_init,this,::_1));

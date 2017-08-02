@@ -59,7 +59,6 @@ void gateway_client::add_callback(std::string event_name, std::function<void(jso
 }
 
 void gateway_client::set_status(concordpp::gateway::status_types::status status, std::string playing, bool afk, std::time_t idle_since) {
-    debug::log(debug::log_level::INFORMATIONAL, debug::log_origin::GATEWAY, "Game status");
     json data;
     data["op"] = 3;
     if(idle_since == -1) data["d"]["since"] = NULL;
@@ -67,6 +66,5 @@ void gateway_client::set_status(concordpp::gateway::status_types::status status,
     data["d"]["status"] = status;
     data["d"]["game"]["name"] = playing;
     data["d"]["afk"] = afk;
-    debug::log(debug::log_level::INFORMATIONAL, debug::log_origin::GATEWAY, data.dump(4));
     socket->send(data.dump());
 }
