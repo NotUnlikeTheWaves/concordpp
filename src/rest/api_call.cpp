@@ -33,6 +33,11 @@ void rest_client::perform_request(std::string uri, rest_request_type method, htt
             response = rest_conn.del(uri);
             break;
     }
+        // Timeout, keep trying.
+    if(response.code == 28) {
+        perform_request(uri, method, callback, argument);
+        return;
+    }
     try {
         json message = json::parse(response.body);
         if(response.code == 429) {  // Being rate limited
