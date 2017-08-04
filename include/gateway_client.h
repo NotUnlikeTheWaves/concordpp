@@ -16,6 +16,7 @@ namespace concordpp {
             static const status OFFLINE = "offline";
         }
         class gateway_client {
+            typedef std::string snowflake;
         public:
             gateway_client(std::string token);
             ~gateway_client();
@@ -27,6 +28,7 @@ namespace concordpp {
 
                 // ========== gateway methods ========== //
             void set_status(concordpp::gateway::status_types::status status, std::string playing, bool afk = false, std::time_t idle_since = -1);
+            void request_guild_members(snowflake guild, std::string starts_with = "", int limit = 0);
 
         private:
             enum connection_state {

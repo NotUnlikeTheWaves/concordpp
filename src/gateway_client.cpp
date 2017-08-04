@@ -68,3 +68,12 @@ void gateway_client::set_status(concordpp::gateway::status_types::status status,
     data["d"]["afk"] = afk;
     socket->send(data.dump());
 }
+
+void gateway_client::request_guild_members(snowflake guild, std::string starts_with, int limit) {
+    json data;
+    data["op"] = 8;
+    data["d"]["guild_id"] = guild;
+    data["d"]["query"] = starts_with;
+    data["d"]["limit"] = limit;
+    socket->send(data.dump());
+}
