@@ -58,6 +58,10 @@ void gateway_client::add_callback(std::string event_name, std::function<void(jso
     cb_handler.add_callback(event_name, callback);
 }
 
+void gateway_client::add_command(std::string command_name, std::function<void(nlohmann::json)> callback) {
+    cb_handler.add_command(command_name, callback);
+}
+
 void gateway_client::set_status(concordpp::gateway::status_types::status status, std::string playing, bool afk, std::time_t idle_since) {
     json data;
     data["op"] = 3;

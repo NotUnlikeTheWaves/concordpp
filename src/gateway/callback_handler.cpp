@@ -16,6 +16,13 @@ void callback_handler::add_callback(std::string event_name, std::function<void(j
     callbacks.push_back(cb);
 }
 
+void callback_handler::add_command(std::string command, std::function<void(nlohmann::json)> callback) {
+    if(command.length() > 0) {
+        command_callback * cb = new command_callback(command, callback);
+        callbacks.push_back(cb);
+    }
+}
+
 void callback_handler::handle_event(std::string event_name, json data) {
     for(auto iter = callbacks.begin(); iter != callbacks.end(); iter++) {
         if(event_name.compare((*iter)->get_event()) == 0)
