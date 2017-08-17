@@ -1,5 +1,7 @@
 #include "rest_client.h"
 #include "internal/debug.h"
+#include <thread>
+#include <chrono>
     // Max interval between requests in milliseconds
 #define CONCORDPP_MAX_REQUEST_INTERVAL 60000
 
@@ -7,7 +9,7 @@ using namespace concordpp::rest;
 using json = nlohmann::json;
 
 void rest_client::api_call(std::string uri, rest_request_type method, http_callback callback, nlohmann::json argument) {
-    boost::thread t = boost::thread(boost::bind(&rest_client::perform_request, this, uri, method, callback, argument));
+    std::thread t = std::thread(std::bind(&rest_client::perform_request, this, uri, method, callback, argument));
     t.detach();
 }
 
@@ -43,7 +45,7 @@ void rest_client::perform_request(std::string uri, rest_request_type method, htt
         if(response.code == 429) {  // Being rate limited
             int wait_for = message["retry_after"].get<int>();
             debug::log(debug::log_level::INFORMATIONAL, debug::log_origin::REST, "API request exceeds rate limts. Retrying in " + std::to_string(wait_for) + "ms");
-            boost::this_thread::sleep(boost::posix_time::milliseconds(wait_for));
+            std::this_thread::sleep_for(std::chrono::milliseconds(wait_for));
             perform_request(uri, method, callback, argument);
         }
         else callback(response.code, message);
