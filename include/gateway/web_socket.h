@@ -1,6 +1,4 @@
-#ifndef GATEWAY_WEB_SOCKET_H
-#define GATEWAY_WEB_SOCKET_H
-
+#pragma once
 #include <websocketpp/config/asio_client.hpp>
 #include <websocketpp/client.hpp>
 #include <boost/thread/thread.hpp>
@@ -58,4 +56,4 @@ namespace concordpp {
         };
     }
 }
-#endif
+

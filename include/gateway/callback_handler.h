@@ -1,5 +1,4 @@
-#ifndef CALLBACK_HANDLER_H
-#define CALLBACK_HANDLER_H
+#pragma once
 #include "gateway/callback.h"
 #include "gateway/command.h"
 #include <vector>
@@ -17,4 +16,3 @@ namespace concordpp {
     }
 }
 
-#endif

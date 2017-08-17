@@ -1,6 +1,4 @@
-#ifndef REST_CLIENT_H
-#define REST_CLIENT_H
-
+#pragma once
 #include <functional>
 #include <boost/thread/thread.hpp>
 #include <restclient-cpp/connection.h>
@@ -40,4 +38,3 @@ namespace concordpp {
     }
 }
 
-#endif

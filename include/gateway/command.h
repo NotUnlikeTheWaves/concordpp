@@ -1,6 +1,4 @@
-#ifndef COMMAND_H
-#define COMMAND_H
-
+#pragma once
 #include "gateway/callback.h"
 
 namespace concordpp {
@@ -16,4 +14,3 @@ namespace concordpp {
     }
 }
 
-#endif
