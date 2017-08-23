@@ -37,7 +37,7 @@ set_target_properties(${PROJECT_NAME}
 )
 
 include_directories(
-		${CMAKE_SOURCE_DIR}/include
+		${CMAKE_CURRENT_SOURCE_DIR}/include
 		${Boost_INCLUDE_DIRS}
 		${CMAKE_CURRENT_SOURCE_DIR}/libs/websocketpp
 		${CMAKE_CURRENT_SOURCE_DIR}/libs/json
