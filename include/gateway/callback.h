@@ -1,4 +1,6 @@
-#pragma once
+#ifndef CALLBACK_H
+#define CALLBACK_H
+
 #include <functional>
 #include <json.hpp>
 
@@ -17,3 +19,4 @@ namespace concordpp {
     }
 }
 
+#endif

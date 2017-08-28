@@ -1,8 +1,6 @@
 #include <websocketpp/config/asio_client.hpp>
 #include <websocketpp/client.hpp>
 #include <json.hpp>
-#include <thread>
-#include <chrono>
 #include "gateway/web_socket.h"
 #include "internal/debug.h"
 
@@ -47,11 +45,7 @@ web_socket::web_socket(std::string *token, callback_handler *cb_handler, connect
 web_socket::~web_socket() {
     if(heartbeat_thread != NULL) {
         if(heartbeat_is_running == true) {
-			// request that we terminate.
-            this->heartbeat_is_running = false;
-			// Tell the threads something is happening.
-			this->cv.notify_all();
-			// wait for them/it all to join.
+            heartbeat_thread->interrupt();
             heartbeat_thread->join();
         }
         delete heartbeat_thread;
@@ -142,14 +136,14 @@ void web_socket::on_message(websocketpp::connection_hdl hdl, message_ptr msg) {
         case 9: {
                 // Can't connect properly, so just identify. Wait for 5 seconds according to discord reference.
             debug::log(debug::log_level::INFORMATIONAL, debug::log_origin::GATEWAY, "Failed to resume session. Identifying instead.");
-            std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+            boost::this_thread::sleep_for(boost::chrono::milliseconds(5000));
             identify();
             break;
         }
         case 10: {  // hello
             debug::log(debug::log_level::INFORMATIONAL, debug::log_origin::GATEWAY, "Hello OPcode received, identifying");
             heartbeat_interval = json_msg["d"]["heartbeat_interval"].get<int>();
-            heartbeat_thread = new std::thread(std::bind(&web_socket::send_heartbeat, this));
+            heartbeat_thread = new boost::thread(boost::bind(&web_socket::send_heartbeat, this));
             switch(connection_route) {
                 case NORMAL:
                     identify();
@@ -196,16 +190,12 @@ void web_socket::on_close(websocketpp::connection_hdl) {
     debug::log(debug::log_level::INFORMATIONAL, debug::log_origin::GATEWAY, "on_close() called");
 }
 
-
 void web_socket::send_heartbeat() {
-    // unique lock for wait condition.
-    std::unique_lock<std::mutex> lk(this->heartbeatlock);
-
-    this->heartbeat_is_running.store(true);
+    heartbeat_is_running = true;
     heartbeat_received = true;
     json heartbeat;
     heartbeat["op"] = 1;    // Heartbeat OP
-    while(heartbeat_is_running.load()) {
+    while(true) {
         if(heartbeat_received == false) {
             stop(websocketpp::close::status::try_again_later);
             break;
@@ -214,11 +204,9 @@ void web_socket::send_heartbeat() {
         heartbeat["d"] = last_sequence_number;
         client.send(persistent_hdl, heartbeat.dump(), websocketpp::frame::opcode::text);
         debug::log(debug::log_level::INFORMATIONAL, debug::log_origin::GATEWAY, "Sending heartbeat");
-
-        // This condition variable allows us to wait for the next heartbeat or terminate the thread if we're requested.
-        this->cv.wait_for(lk, std::chrono::milliseconds(heartbeat_interval), [this](){ return !this->heartbeat_is_running.load(); });
-//        std::this_thread::sleep_for(std::chrono::milliseconds(heartbeat_interval));
+        boost::this_thread::sleep_for(boost::chrono::milliseconds(heartbeat_interval));
     }
+    heartbeat_is_running = false;
 }
 
 void web_socket::send(std::string data) {

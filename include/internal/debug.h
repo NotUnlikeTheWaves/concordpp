@@ -1,4 +1,5 @@
-#pragma once
+#ifndef INTERNAL_DEBUG_H
+#define INTERNAL_DEBUG_H
 #include <string>
 namespace concordpp {
     namespace debug {
@@ -19,3 +20,4 @@ namespace concordpp {
     }
 }
 
+#endif

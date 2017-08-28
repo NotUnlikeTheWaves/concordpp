@@ -1,9 +1,9 @@
-#pragma once
+#ifndef GATEWAY_WEB_SOCKET_H
+#define GATEWAY_WEB_SOCKET_H
+
 #include <websocketpp/config/asio_client.hpp>
 #include <websocketpp/client.hpp>
-#include <mutex>
-#include <atomic>
-#include <condition_variable>
+#include <boost/thread/thread.hpp>
 #include "gateway/callback_handler.h"
 
 namespace concordpp {
@@ -35,10 +35,8 @@ namespace concordpp {
             int heartbeat_interval;
             bool heartbeat_received;
             connection_type connection_route;
-            std::atomic<bool> heartbeat_is_running;
-            std::mutex heartbeatlock;
-            std::condition_variable cv;
-            std::thread *heartbeat_thread;
+            bool heartbeat_is_running;
+            boost::thread *heartbeat_thread;
 
             callback_handler *cb_handler;
 
@@ -60,4 +58,4 @@ namespace concordpp {
         };
     }
 }
-
+#endif

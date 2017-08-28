@@ -12,11 +12,12 @@ gateway_client::gateway_client(std::string token) {
 }
 
 gateway_client::~gateway_client() {
-    if(gateway_connect_state != CLOSE)
+    if(gateway_connect_state != CLOSE) {
         stop();
-
-    if(socket)
+    }
+    if(socket != NULL) {
         delete socket;
+    }
 }
 
 void gateway_client::connect() {
@@ -64,11 +65,8 @@ void gateway_client::add_command(std::string command_name, std::function<void(nl
 void gateway_client::set_status(concordpp::gateway::status_types::status status, std::string playing, bool afk, std::time_t idle_since) {
     json data;
     data["op"] = 3;
-    if (idle_since == -1)
-        data["d"]["since"] = NULL;
-    else
-        data["d"]["since"] = idle_since;
-
+    if(idle_since == -1) data["d"]["since"] = NULL;
+    else data["d"]["since"] = idle_since;
     data["d"]["status"] = status;
     data["d"]["game"]["name"] = playing;
     data["d"]["afk"] = afk;
