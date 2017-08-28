@@ -1,5 +1,4 @@
-#ifndef GATEWAY_CLIENT_H
-#define GATEWAY_CLIENT_H
+#pragma once
 
 #include <string>
 #include "gateway/web_socket.h"
@@ -47,4 +46,3 @@ namespace concordpp {
     }
 }
 
-#endif

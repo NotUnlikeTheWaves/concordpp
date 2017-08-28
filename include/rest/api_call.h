@@ -1,6 +1,4 @@
-#ifndef API_CALL_H
-#define API_CALL_H
-
+#pragma once
 namespace concordpp {
     namespace rest {
         enum rest_request_type {
@@ -12,4 +10,3 @@ namespace concordpp {
     }
 }
 
-#endif
